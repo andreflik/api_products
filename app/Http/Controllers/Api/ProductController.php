@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\API\ApIError;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
@@ -21,11 +22,24 @@ class ProductController extends Controller
     }
 
     public function show(Product $id) {
+
         $data = ['data' => $id];
         return response()->json($data);
     }
 
     public function store(Request $request) {
-        $producData = $request->all();
+
+        try {
+            $productData = $request->all();
+        $this->product->create($productData);
+
+        return response()->json(['msg' => 'Produto criando com sucesso !'], 201);
+        }
+        catch(\Exception $e) {
+            if (config('app.debug')) {
+                return response()->json(ApIError::errorMessage($e->getMessage(), 1010));
+            }
+        }
+        
     }
 }
