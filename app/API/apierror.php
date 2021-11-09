@@ -2,13 +2,17 @@
 
 namespace App\API;
 
-class ApIError {
+class ApiError {
 
     public static function errorMessage($message, $code) {
         return [
-            'msg' => $message,
-            'code' => $code
+            'data' => [
+                'msg' => $message,
+                'code' => $code
+            ]
         ];
+            
+        
     }
 
 }

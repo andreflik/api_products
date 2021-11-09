@@ -37,8 +37,9 @@ class ProductController extends Controller
         }
         catch(\Exception $e) {
             if (config('app.debug')) {
-                return response()->json(ApIError::errorMessage($e->getMessage(), 1010));
+                return response()->json(ApiError::errorMessage($e->getMessage(), 1010));
             }
+            return response()->json(ApiError::errorMessage('Houve um erro na operação', 1010));
         }
         
     }
