@@ -21,9 +21,13 @@ class ProductController extends Controller
         return response()->json($this->product->paginate(10));
     }
 
-    public function show(Product $id) {
+    public function show($id) {
 
-        $data = ['data' => $id];
+        $product = $this->product->find($id);
+        
+        if(! $product) return response()->json(['data' => ['msg' => 'Produto não encontrado']]);
+
+        $data = ['data' =>  $product];
         return response()->json($data);
     }
 
@@ -31,16 +35,45 @@ class ProductController extends Controller
 
         try {
             $productData = $request->all();
-        $this->product->create($productData);
+            $this->product->create($productData);
 
-        return response()->json(['msg' => 'Produto criando com sucesso !'], 201);
+            return response()->json(['msg' => 'Produto criando com sucesso !'], 201);
         }
         catch(\Exception $e) {
             if (config('app.debug')) {
-                return response()->json(ApiError::errorMessage($e->getMessage(), 1010));
+                return response()->json(ApiError::errorMessage($e->getMessage(), 1010, 500));
             }
-            return response()->json(ApiError::errorMessage('Houve um erro na operação', 1010));
+            return response()->json(ApiError::errorMessage('Houve um erro ao criar', 1010, 500));
         }
         
     }
+        public function update(Request $request, $id) {
+
+            try {
+                $productData = $request->all();
+                $product = $this->product->find($id);
+                $product->update($productData);
+
+                return response()->json(['msg' => 'Produto atualizado com sucesso !'], 201);
+            }
+            catch(\Exception $e) {
+                if (config('app.debug')) {
+                    return response()->json(ApiError::errorMessage($e->getMessage(), 1011, 500));
+                }
+                return response()->json(ApiError::errorMessage('Houve um erro ao atualizar', 1011, 500));
+            }
+            
+        }
+        public function delete(Product $id) {
+            try {
+                $id->delete();
+                return response()->json(['data' => ['msg' => 'Produto ' . $id->name . ' removido com sucesso !']], 200);
+            }
+            catch (\Exception $e) {
+                if (config('app.debug')) {
+                    return response()->json(ApiError::errorMessage($e->getMessage(), 1012));
+                }
+                return response()->json(ApiError::errorMessage('Houve um erro ao remover o produto', 1012));
+            }
+        }
 }
